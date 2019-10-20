@@ -1,5 +1,5 @@
 # Anti-Food Waste Quiz 2019
-This is the repo of the anti-food waste quiz writted in Python 3 that can be run on a Raspberry Pi (Raspberry Pi 3B+ tested).
+This is the repo of the anti-food waste quiz writted in Python 3 that can be run on a Raspberry Pi (Raspberry Pi 1B+ and 3B+ tested).
 
 This code is a project for school students.
 
