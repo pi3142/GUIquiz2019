@@ -1,9 +1,7 @@
 # Anti-Food Waste Quiz 2019
 This is the repo of the anti-food waste quiz writted in Python 3 that can be run on a Raspberry Pi (Raspberry Pi 1B+ and 3B+ tested).
 
-This code is a project for school students.
-
-You can use it any way you you want.
+This code is a project to teach pupils not to waste food.
 
 ### Setup
 1. Install the ThorPy and pygame libraries with:
