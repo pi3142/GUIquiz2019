@@ -187,7 +187,7 @@ class QuizMain(object):
         if self.correctQns == 0:
             self.encouragementText = thorpy.make_text('Good try, but you did not get \nany questions correct.', 50, (0, 0, 0, 100))
         else:
-            self.encouragement = 'Great job! You got ' + str(self.correctQns) + ' correct!'
+            self.encouragement = 'Great job! You got ' + str(self.correctQns) + ' questions correct!'
             self.encouragementText = thorpy.make_text(self.encouragement, 50, (0, 0, 0, 100))
 
         self.encouragementText.center()
