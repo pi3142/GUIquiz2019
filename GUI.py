@@ -125,7 +125,7 @@ class QuizMain(object):
         self.P3_4Level = thorpy.make_button("P3 or 4", func=self.P3_4)
         self.P5_6Level = thorpy.make_button("P5 or 6", func=self.P5_6)
         #Action elements(i.e. OK, quit)
-        self.OKbutton2 = thorpy.make_button("Collect my prize!", func=self.OKPressed)
+        self.OKbutton2 = thorpy.make_button("Collect my prize(s)!", func=self.OKPressed)
         self.OKPlaceholder = thorpy.make_button("Continue (Just a placeholder)", func=self.OKPressed)
         self.OKbutton = thorpy.make_button("Continue", func=self.OKPressed)
         self.OKbutton1 = thorpy.make_button("Continue", func=self.OKPressed)
