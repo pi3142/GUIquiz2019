@@ -267,7 +267,7 @@ class QuizMain(object):
         if self.correctQns == 0:
             self.encouragementText = thorpy.make_text('Good try, but you did not get \nany questions correct.', 50, (0, 0, 0, 100))
         else:
-            self.encouragement = 'Great job! You got ' + str(self.correctQns) + ' questions correct!'
+            self.encouragement = 'Great job! You got ' + str(self.correctQns) + ' question(s) correct!'
             self.encouragementText = thorpy.make_text(self.encouragement, 50, (0, 0, 0, 100))
 
         self.encouragementText.center()
@@ -276,7 +276,7 @@ class QuizMain(object):
         self.prizesToGive = self.correctQns
         if self.correctQns == 2:
             self.prizesToGive = self.prizesToGive + 1
-        self.textPrizesToGive = 'You get ' + str(self.prizesToGive) + ' prizes!'
+        self.textPrizesToGive = 'You get ' + str(self.prizesToGive) + ' prize(s)!'
         self.prizesToGiveElement = thorpy.make_text(self.textPrizesToGive, 40, (4, 2, 158, 100))
 
         self.givePrizesBox = thorpy.Box(elements=[self.prizesToGiveElement, self.OKbutton2])
