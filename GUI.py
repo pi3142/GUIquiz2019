@@ -1,46 +1,114 @@
-import thorpy, pygame
+import thorpy, pygame, os #ThorPy for basic GUI functionality, PyGame for low-level interface with video device, OS for executing terminal commands
+
+from threading import Timer
 
 #Dynamic varables
-spinSensorVal = 0
+spinSensorVal = 4
 global correct
 correct = False
 
+class RepeatedTimer(object):
+    def __init__(self, interval, function, *args, **kwargs):
+        self._timer     = None
+        self.interval   = interval
+        self.function   = function
+        self.args       = args
+        self.kwargs     = kwargs
+        self.is_running = False
+        self.start()
+
+    def _run(self):
+        self.is_running = False
+        self.start()
+        self.function(*self.args, **self.kwargs)
+
+    def start(self):
+        if not self.is_running:
+            self._timer = Timer(self.interval, self._run)
+            self._timer.start()
+            self.is_running = True
+
+    def stop(self):
+        self._timer.cancel()
+        self.is_running = False
+
 class QuizMain(object):
+    #These 'checkAns' functions take the quiz option button input and checks if answer is correct.
     def checkAns1(self):
         global correct
-        #Todo: check if entered ans matched ans
-        #For now, this function returns correct all the time
-        correct = True
-        self.correctQns += 1
-        print(correct)
-        thorpy.functions.quit_menu_func()
+        #Done: check if entered ans matched ans
+        if self.pupilLevel == 1:
+            self.testAns = self.P1_2CorrectAns
+        elif self.pupilLevel == 3:
+            self.testAns = self.P3_4CorrectAns
+        else:
+            self.testAns = self.P5_6CorrectAns
+        if int(self.testAns[spinSensorVal]) == 1:
+            self.correctQns += 1
+            correct = True
+            print(correct)
+            thorpy.functions.quit_menu_func()
+        else:
+            correct = False
+            print(correct)
+            thorpy.functions.quit_menu_func()
 
     def checkAns2(self):
         global correct
-        #Todo: check if entered ans matched ans
-        #For now, this function returns correct all the time
-        self.correctQns += 1
-        correct = True
-        print(correct)
-        thorpy.functions.quit_menu_func()
+        #Done: check if entered ans matched ans
+        if self.pupilLevel == 1:
+            self.testAns = self.P1_2CorrectAns
+        elif self.pupilLevel == 3:
+            self.testAns = self.P3_4CorrectAns
+        else:
+            self.testAns = self.P5_6CorrectAns
+        if int(self.testAns[spinSensorVal]) == 2:
+            self.correctQns += 1
+            correct = True
+            print(correct)
+            thorpy.functions.quit_menu_func()
+        else:
+            correct = False
+            print(correct)
+            thorpy.functions.quit_menu_func()
 
     def checkAns3(self):
         global correct
-        #Todo: check if entered ans matched ans
-        #For now, this function returns correct all the time
-        self.correctQns += 1
-        correct = True
-        print(correct)
-        thorpy.functions.quit_menu_func()
+        #Done: check if entered ans matched ans
+        if self.pupilLevel == 1:
+            self.testAns = self.P1_2CorrectAns
+        elif self.pupilLevel == 3:
+            self.testAns = self.P3_4CorrectAns
+        else:
+            self.testAns = self.P5_6CorrectAns
+        if int(self.testAns[spinSensorVal]) == 3:
+            self.correctQns += 1
+            correct = True
+            print(correct)
+            thorpy.functions.quit_menu_func()
+        else:
+            correct = False
+            print(correct)
+            thorpy.functions.quit_menu_func()
 
     def checkAns4(self):
         global correct
-        #Todo: check if entered ans matched ans
-        #For now, this function returns correct all the time
-        self.correctQns += 1
-        correct = True
-        print(correct)
-        thorpy.functions.quit_menu_func()
+        #Done: check if entered ans matched ans
+        if self.pupilLevel == 1:
+            self.testAns = self.P1_2CorrectAns
+        elif self.pupilLevel == 3:
+            self.testAns = self.P3_4CorrectAns
+        else:
+            self.testAns = self.P5_6CorrectAns
+        if int(self.testAns[spinSensorVal]) == 4:
+            self.correctQns += 1
+            correct = True
+            print(correct)
+            thorpy.functions.quit_menu_func()
+        else:
+            correct = False
+            print(correct)
+            thorpy.functions.quit_menu_func()
 
     def createQuizElements(self):
         if self.pupilLevel == 1:
@@ -67,6 +135,12 @@ class QuizMain(object):
             self.Op3Button = thorpy.make_button(row[2], func=self.checkAns3)
             self.Op4Button = thorpy.make_button(row[3], func=self.checkAns4)
 
+        #Timer text element
+        self.timeTextString = 'Time left: ' + str(self.timeLeft) + ' seconds'
+        self.timeLeftText = thorpy.make_text(self.timeTextString, 25, (255, 255, 255, 100))
+        self.timeLeftText.center()
+        self.timeLeftText.set_topleft((6, 400))
+
         self.Op1Button.center()
         self.Op1Button.set_topleft((None, 160))
         self.Op2Button.center()
@@ -79,6 +153,7 @@ class QuizMain(object):
         self.questionText.set_topleft((None, 6))
 
     def OKPressed(self):
+        self.OK == True
         print("OK button pressed")
         thorpy.functions.quit_menu_func()
 
@@ -102,15 +177,20 @@ class QuizMain(object):
         self.application = thorpy.Application(size=(800, 480), caption='Recess Quiz')
 
         #The working varables of the game
+        self.OK = False
         self.correctQns = 0
         self.pupilLevel = None #Level of the pupil
-        self.maxtime = 25 #Time player has per qn
-        self.P1_2Qn = ('What is compost?', 'Why should we save food?', 'How do we make sure we only \nbuy what we need?', 'How many bowls of rice are wasted \non average per day in one household?', 'Q5', 'Q6')
-        self.P3_4Qn = ('What are the harmful effects \nof food waste when it rots?', 'Who will be affected by food wastage?', 'What can we do to prevent \nfood waste? Name 2', 'What do supermarkets do to \nreduce food waste?', 'Q5', 'Q6')
-        self.P5_6Qn = ('What can you do when you cannot finish your food?', 'What are the causes of food waste?', 'What organisation collects unfinished food and distrobutes them to needy people?', 'Q4', 'Q5', 'Q6')
-        self.P1_2Op = ('Water,Soil,Rotten remains of food,Rotten meat', "Doing so can reduce global warming,It's fun,It is time-consuming,You can earn money", "O1,O2,O3,O4", "Two bowls,One bowl,Five bowls,Ten bowls", "O1,O2,O3,O4", "O1,O2,O3,O4")
-        self.P3_4Op = ('It creates water which causes flooding,It gives off methane which contributes to global warming,It gives off oxygen which kills plants,It gives off carbon dioxide', 'Growth of plants,Us and animals,Seaweed,Cats and Dogs', 'O1,O2,O3,O4', 'Sell less visually appealing food at a lower price instead of throwing it away,Pick out less appealing food and throw it away,Compost less visually appealing food,Sell less visually appealing food at a hiigher price instead of throwing it away.', 'O1,O2,O3,O4', 'O1,O2,O3,O4')
-        self.P5_6Op = ('Throw it away,Give it to your pet,Create compost with it,Donate it to Foodbank', 'Growing food,Eating expired food,Preserving uneaten food,Throwing away uneaten food', 'Ordering too much food and throwing away the leftovers,Sharing your food with your friends,Throwing away uneaten food,Finishing all your food', 'O1,O2,O3,O4', 'O1,O2,O3,O4', 'O1,O2,O3,O4')
+        self.maxTime = 25 #Time player has per qn
+        self.timeLeft = self.maxTime + 0.125
+        self.P1_2Qn = ('What is compost?', 'Why should we save food?', 'How do we make sure we only \nbuy what we need?', 'How many bowls of rice are wasted \non average per day in one household?', 'Name a simple way to save \nfood at home.', 'Q6')
+        self.P3_4Qn = ('What are the harmful effects \nof food waste when it rots?', 'Who will be affected by food wastage?', 'What can we do to prevent \nfood waste? Name 1', 'What do supermarkets do to \nreduce food waste?', 'What can compost be used for?', 'Q6')
+        self.P5_6Qn = ('What can you do when you \ncannot finish your food?', 'What is one of the cause of food waste?', 'What organisation collects unfinished food \nand distrobutes them to needy people?', 'What percentage of food is wasted in the world?', 'Q5', 'Q6')
+        self.P1_2Op = ('Water,Soil,Rotten remains of food,Rotten meat', "Doing so can reduce global warming,It's fun,It is time-consuming,You can earn money", "Buy food on impulse,Do not buy foods which are not visually appealing,Throw away the excess food that you have bought,Check what food you already have to make a shopping list", "Two bowls,One bowl,Five bowls,Ten bowls", "Cook way too much food,Store leftover food for cosumption in the future,Do not eat any food cooked at home,Throw away any leftovers", "O1,O2,O3,O4")
+        self.P3_4Op = ('It creates water which causes flooding,It gives off methane which contributes to global warming,It gives off oxygen which kills plants,It gives off carbon dioxide', 'Growth of plants,Everybody,Seaweed,Cats and Dogs', 'Eat out everyday,Cook too little food for your family,Use Olio to give partially eaten food to neighbours,Eat leftovers for the next meal', 'Sell less visually appealing food at a lower price instead of throwing it away,Pick out less appealing food and throw it away,Compost less visually appealing food,Sell less visually appealing food at a hiigher price instead of throwing it away.', 'Soil for plants,Add flavour to your food,Fertiliser for plants,Sell away for money', 'O1,O2,O3,O4')
+        self.P5_6Op = ('Throw it away,Give it to your pet,Create compost with it,Donate it to Foodbank', 'Growing food,Eating expired food,Preserving uneaten food,Throwing away uneaten food', 'Foodbank,Bloodbank,Fairprice,Olio', 'About 10%,About 30%,About 20%,About 35%', 'O1,O2,O3,O4', 'O1,O2,O3,O4')
+        self.P1_2CorrectAns = ('3', '1', '4', '1', '2', 'False')
+        self.P3_4CorrectAns = ('2', '2', '4', '1', '3', 'False')
+        self.P5_6CorrectAns = ('3', '4', '1', '2', 'False', 'False')
 
         #The static elements
         #Text elements
@@ -179,7 +259,7 @@ class QuizMain(object):
 
         #Done: Draw the instructions page
 
-        #Todo: Draw the gameLoader page
+        #Done: Draw the gameLoader page
 
     def givePrizesLoader(self):
         #This page prints the number of prizes the pupil gets
@@ -205,17 +285,24 @@ class QuizMain(object):
         self.givePrizesBox.set_topleft((None, 60))
         self.givePrizesBox.set_main_color((220,220,220,180)) #set box color and opacity
 
-        self.givePrize = thorpy.Background(image="/Users/kxzv/quiz/prize.jpg", elements=[self.encouragementText, self.givePrizesBox])
+        self.givePrize = thorpy.Background(image="prize.jpg", elements=[self.encouragementText, self.givePrizesBox])
 
         self.givePrizePage = thorpy.Menu(self.givePrize)
         self.givePrizePage.play()
 
+    def startQuizGameBG(self):
+        if self.timeLeft == 0:
+            self.rt.stop()
+        self.timeLeft -= 0.125
+        self.quizGame = thorpy.Background(image='quizAbstract.jpg', elements=[self.questionText, self.Op1Button, self.Op2Button, self.Op3Button, self.Op3Button, self.Op4Button, self.quit3])
+        self.quizGamePage = thorpy.Menu(self.quizGame)
+        self.quizGamePage.play()
+
     def quiz_resultsLoader(self):
         print("Reached Here - Quiz page")
         self.createQuizElements()
-        self.quizGame = thorpy.Background(image='/Users/kxzv/quiz/quizAbstract.jpg', elements=[self.questionText, self.Op1Button, self.Op2Button, self.Op3Button, self.Op3Button, self.Op4Button, self.quit3])
-        self.quizGamePage = thorpy.Menu(self.quizGame)
-        self.quizGamePage.play()
+        #self.rt = RepeatedTimer(0.1246, self.startQuizGameBG) #Initiate a 1-second non-blocking timer
+        self.startQuizGameBG()
 
         global correct
         print("Reached Here - Results page")
@@ -227,13 +314,13 @@ class QuizMain(object):
             self.resultText = thorpy.make_text("Good try! \nYou might get it right next time.", 60, (0, 0, 0, 160))
         self.resultText.center()
         self.resultText.set_topleft((None, 30))
-        self.resultsBG = thorpy.Background(image='/Users/kxzv/quiz/abstract.jpg', elements=[self.resultText, self.nextQuestion, self.OKbutton1, self.quit4])
+        self.resultsBG = thorpy.Background(image='abstract.jpg', elements=[self.resultText, self.nextQuestion, self.OKbutton1, self.quit4])
         self.resultsPage = thorpy.Menu(self.resultsBG)
         self.resultsPage.play()
 
     def gameLauncher(self):
         # self.firstBackground = thorpy.Background(image=thorpy.style.EXAMPLE_IMG, elements=[self.firstText, self.levelSlider, self.OKbutton, self.instructions])
-        self.firstBackground = thorpy.Background(image='/Users/kxzv/quiz/quiz.jpg', elements=[self.firstText, self.central_box])
+        self.firstBackground = thorpy.Background(image='quiz.jpg', elements=[self.firstText, self.central_box])
         thorpy.store(self.firstBackground)
 
         self.startScreen = thorpy.Menu(self.firstBackground)
@@ -241,27 +328,27 @@ class QuizMain(object):
         print("Reached Here - End of level page")
 
         #Write Instructions to screen
-        self.instructionsPage = thorpy.Background(image='/Users/kxzv/quiz/abstract.jpg', elements=[self.infoText, self.instructions, self.OKbutton, self.quit1])
+        self.instructionsPage = thorpy.Background(image='abstract.jpg', elements=[self.infoText, self.instructions, self.OKbutton, self.quit1])
         print("Reached Here - Background instructions page")
 
         self.infoScreen = thorpy.Menu(self.instructionsPage)
         self.infoScreen.play()
 
         print("Reached Here - Spin the wheel page")
-        self.spinWheel = thorpy.Background(image='/Users/kxzv/quiz/abstract.jpg', elements=[self.spinWheelText, self.spinWheelInfo, self.quit2, self.OKPlaceholder])
+        self.spinWheel = thorpy.Background(image='abstract.jpg', elements=[self.spinWheelText, self.spinWheelInfo, self.quit2, self.OKPlaceholder])
         self.spinWheelPage = thorpy.Menu(self.spinWheel)
         self.spinWheelPage.play()
 
         self.quiz_resultsLoader()
 
         print("Reached Here - Second spin the wheel page")
-        self.spinWheel = thorpy.Background(image='/Users/kxzv/quiz/abstract.jpg', elements=[self.spinWheelText, self.spinWheelInfo, self.quit2, self.OKPlaceholder])
+        self.spinWheel = thorpy.Background(image='abstract.jpg', elements=[self.spinWheelText, self.spinWheelInfo, self.quit2, self.OKPlaceholder])
         self.spinWheelPage = thorpy.Menu(self.spinWheel)
         self.spinWheelPage.play()
 
         print("Reached Here - Second question and result")
         self.createQuizElements()
-        self.quizGame = thorpy.Background(image='/Users/kxzv/quiz/quizAbstract.jpg', elements=[self.questionText, self.Op1Button, self.Op2Button, self.Op3Button, self.Op3Button, self.Op4Button, self.quit3])
+        self.quizGame = thorpy.Background(image='quizAbstract.jpg', elements=[self.questionText, self.Op1Button, self.Op2Button, self.Op3Button, self.Op3Button, self.Op4Button, self.quit3])
         self.quizGamePage = thorpy.Menu(self.quizGame)
         self.quizGamePage.play()
 
@@ -275,7 +362,7 @@ class QuizMain(object):
             self.resultText = thorpy.make_text("Good try! \nYou might get it right next time.", 60, (0, 0, 0, 160))
         self.resultText.center()
         self.resultText.set_topleft((None, 30))
-        self.resultsBG = thorpy.Background(image='/Users/kxzv/quiz/abstract.jpg', elements=[self.resultText, self.OKbutton1, self.quit4])
+        self.resultsBG = thorpy.Background(image='abstract.jpg', elements=[self.resultText, self.OKbutton1, self.quit4])
         self.resultsPage = thorpy.Menu(self.resultsBG)
         self.resultsPage.play()
 
