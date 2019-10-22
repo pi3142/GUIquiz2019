@@ -7,6 +7,31 @@ spinSensorVal = 4
 global correct
 correct = False
 
+import RPi.GPIO as GPIO
+import time
+
+servoPIN = 17
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(servoPIN, GPIO.OUT)
+
+p = GPIO.PWM(servoPIN, 50) # GPIO 17 for PWM with 50Hz
+p.start(2.5) # Initialization
+p.ChangeDutyCycle(14.5)
+
+#try:
+#  while True:
+#    print('Closed')
+#    p.ChangeDutyCycle(14.5)
+#    time.sleep(0.5)
+#    print('Opened')
+#    p.ChangeDutyCycle(12.5)
+#    time.sleep(0.5)
+    # time.sleep(0.1)
+    # p.ChangeDutyCycle(10)
+#except KeyboardInterrupt:
+#  p.stop()
+#  GPIO.cleanup()
+
 class RepeatedTimer(object):
     def __init__(self, interval, function, *args, **kwargs):
         self._timer     = None
@@ -33,6 +58,20 @@ class RepeatedTimer(object):
         self.is_running = False
 
 class QuizMain(object):
+    def openServoOnce(self):
+        print('Closed')
+        p.ChangeDutyCycle(12.5)
+        time.sleep(0.5)
+        print('Opened')
+        p.ChangeDutyCycle(14.5)
+        time.sleep(0.5)
+
+
+    def dispensePrize(self):
+        for x in range(0, self.prizesToGive):
+            print("We're on time %d" % (x))
+            self.openServoOnce()
+
     #These 'checkAns' functions take the quiz option button input and checks if answer is correct.
     def checkAns1(self):
         global correct
@@ -177,6 +216,7 @@ class QuizMain(object):
         self.application = thorpy.Application(size=(800, 480), caption='Recess Quiz')
 
         #The working varables of the game
+        self.prizesToGive = 0
         self.OK = False
         self.correctQns = 0
         self.pupilLevel = None #Level of the pupil
@@ -367,6 +407,10 @@ class QuizMain(object):
         self.resultsPage.play()
 
         self.givePrizesLoader()
+
+        self.dispensePrize()
+
+        self.gameLauncher()
 
         #Cleanly exit application
         print("Quitting")
