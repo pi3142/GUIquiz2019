@@ -1,22 +1,26 @@
-import thorpy, pygame, os #ThorPy for basic GUI functionality, PyGame for low-level interface with video device, OS for executing terminal commands
+import thorpy, pygame, time, random #ThorPy for basic GUI functionality, PyGame for low-level interface with video device
 
 from threading import Timer
 
+random.seed() #Seed the random number generator
+
 #Dynamic varables
-spinSensorVal = 4
+spinSensorVal = None
 global correct
 correct = False
+COMPUTER = True
 
-import RPi.GPIO as GPIO
-import time
+if COMPUTER == False:
+    import RPi.GPIO as GPIO
+    import time
 
-servoPIN = 17
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(servoPIN, GPIO.OUT)
+    servoPIN = 17
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(servoPIN, GPIO.OUT)
 
-p = GPIO.PWM(servoPIN, 50) # GPIO 17 for PWM with 50Hz
-p.start(2.5) # Initialization
-p.ChangeDutyCycle(14.5)
+    p = GPIO.PWM(servoPIN, 50) # GPIO 17 for PWM with 50Hz
+    p.start(2.5) # Initialization
+    p.ChangeDutyCycle(14.5)
 
 #try:
 #  while True:
@@ -61,16 +65,17 @@ class QuizMain(object):
     def openServoOnce(self):
         print('Closed')
         p.ChangeDutyCycle(12.5)
-        time.sleep(0.5)
+        time.sleep(0.4)
         print('Opened')
         p.ChangeDutyCycle(14.5)
-        time.sleep(0.5)
+        time.sleep(0.4)
 
 
     def dispensePrize(self):
         for x in range(0, self.prizesToGive):
             print("We're on time %d" % (x))
             self.openServoOnce()
+            time.sleep(1)
 
     #These 'checkAns' functions take the quiz option button input and checks if answer is correct.
     def checkAns1(self):
@@ -223,18 +228,18 @@ class QuizMain(object):
         self.maxTime = 25 #Time player has per qn
         self.timeLeft = self.maxTime + 0.125
         self.P1_2Qn = ('What is compost?', 'Why should we save food?', 'How do we make sure we only \nbuy what we need?', 'How many bowls of rice are wasted \non average per day in one household?', 'Name a simple way to save \nfood at home.', 'Q6')
-        self.P3_4Qn = ('What are the harmful effects \nof food waste when it rots?', 'Who will be affected by food wastage?', 'What can we do to prevent \nfood waste? Name 1', 'What do supermarkets do to \nreduce food waste?', 'What can compost be used for?', 'Q6')
+        self.P3_4Qn = ('What are the harmful effects \nof food waste when it rots?', 'Who will be affected by food wastage?', 'What can we do to prevent \nfood waste? Name 1', 'What do supermarkets do to \nreduce food waste?', 'What can compost be used for?', 'How many tonnes of food was \nwasted in Singapore in 2018?')
         self.P5_6Qn = ('What can you do when you \ncannot finish your food?', 'What is one of the cause of food waste?', 'What organisation collects unfinished food \nand distrobutes them to needy people?', 'What percentage of food is wasted in the world?', 'Q5', 'Q6')
         self.P1_2Op = ('Water,Soil,Rotten remains of food,Rotten meat', "Doing so can reduce global warming,It's fun,It is time-consuming,You can earn money", "Buy food on impulse,Do not buy foods which are not visually appealing,Throw away the excess food that you have bought,Check what food you already have to make a shopping list", "Two bowls,One bowl,Five bowls,Ten bowls", "Cook way too much food,Store leftover food for cosumption in the future,Do not eat any food cooked at home,Throw away any leftovers", "O1,O2,O3,O4")
-        self.P3_4Op = ('It creates water which causes flooding,It gives off methane which contributes to global warming,It gives off oxygen which kills plants,It gives off carbon dioxide', 'Growth of plants,Everybody,Seaweed,Cats and Dogs', 'Eat out everyday,Cook too little food for your family,Use Olio to give partially eaten food to neighbours,Eat leftovers for the next meal', 'Sell less visually appealing food at a lower price instead of throwing it away,Pick out less appealing food and throw it away,Compost less visually appealing food,Sell less visually appealing food at a hiigher price instead of throwing it away.', 'Soil for plants,Add flavour to your food,Fertiliser for plants,Sell away for money', 'O1,O2,O3,O4')
+        self.P3_4Op = ('It creates water which causes flooding,It gives off methane which contributes to global warming,It gives off oxygen which kills plants,It gives off carbon dioxide', 'Growth of plants,Everybody,Seaweed,Cats and Dogs', 'Eat out everyday,Cook too little food for your family,Use Olio to give partially eaten food to neighbours,Eat leftovers for the next meal', 'Sell less visually appealing food at a lower price instead of throwing it away,Pick out less appealing food and throw it away,Compost less visually appealing food,Sell less visually appealing food at a hiigher price instead of throwing it away.', 'Soil for plants,Add flavour to your food,Fertiliser for plants,Sell away for money', '253427,350000,100000,763100')
         self.P5_6Op = ('Throw it away,Give it to your pet,Create compost with it,Donate it to Foodbank', 'Growing food,Eating expired food,Preserving uneaten food,Throwing away uneaten food', 'Foodbank,Bloodbank,Fairprice,Olio', 'About 10%,About 30%,About 20%,About 35%', 'O1,O2,O3,O4', 'O1,O2,O3,O4')
         self.P1_2CorrectAns = ('3', '1', '4', '1', '2', 'False')
-        self.P3_4CorrectAns = ('2', '2', '4', '1', '3', 'False')
+        self.P3_4CorrectAns = ('2', '2', '4', '1', '3', '4')
         self.P5_6CorrectAns = ('3', '4', '1', '2', 'False', 'False')
 
         #The static elements
         #Text elements
-        self.spinWheelText = thorpy.make_text("Spin the colour wheel!", 60, (255, 255, 255, 160))
+        self.randomNumberText = thorpy.make_text("Get a random number", 60, (255, 255, 255, 160))
         self.firstText = thorpy.make_text("First, let's start with your level.", 60, (0, 255, 0))
         self.infoText = thorpy.make_text("Instructions", 60, (255, 255, 255, 160))
         self.questionText = None
@@ -256,7 +261,10 @@ class QuizMain(object):
         #Instructions
         # self.instructions = thorpy.make_text("When you click on the continue button at the \nbottom of the screen, you will be prompted \nto spin the wheel to select the question. \nAfter you have done that, a question and four \noptions would appear on the screen. Once \nyou have clicked on one of the options, you \nwould be told if your answer is correct. After that, \nthis process would be repeated once. At the end of the \ngame, you would get lucky stars corresponding \nto the number of questions you correctly answered.", 30, (4, 2, 158, 100))
         self.instructions = thorpy.make_text("Click the CONTINUE button below. \nSpin the colour wheel to get a question. \nFor each question, tap one of the four \noptions for your answer. You have 25 \nseconds to answer each question. \nAnswer two questions and get lucky \nstars corresponding to the number of \ncorrect answers.", 30, (4, 2, 158, 100))
-        self.spinWheelInfo = thorpy.make_text("Please spin the colour wheel to get a question.\n(Currently, the wheel is not wired up yet.)", 30, (4, 2, 158, 100))
+        self.randomNumber = random.randint(0, 5)
+        spinSensorVal = self.randomNumber
+        print(spinSensorVal)
+        self.randomNumberNumber = thorpy.make_text("Your random number is: " + str(self.randomNumber), 30, (4, 2, 158, 100))
 
         #Static element configuration
         #Instructions page
@@ -269,10 +277,10 @@ class QuizMain(object):
         self.quit1.center()
         self.quit1.set_topleft((None, 385))
         #Spin-the-wheel page
-        self.spinWheelText.center()
-        self.spinWheelText.set_topleft((None, 6))
-        self.spinWheelInfo.center()
-        self.spinWheelInfo.set_topleft((None, 60))
+        self.randomNumberText.center()
+        self.randomNumberText.set_topleft((None, 6))
+        self.randomNumberNumber.center()
+        self.randomNumberNumber.set_topleft((None, 60))
         self.quit2.center()
         self.quit2.set_topleft((None, 195))
         self.OKPlaceholder.center()
@@ -374,15 +382,16 @@ class QuizMain(object):
         self.infoScreen = thorpy.Menu(self.instructionsPage)
         self.infoScreen.play()
 
-        print("Reached Here - Spin the wheel page")
-        self.spinWheel = thorpy.Background(image='abstract.jpg', elements=[self.spinWheelText, self.spinWheelInfo, self.quit2, self.OKPlaceholder])
+        print("Reached Here - Random number page")
+        self.spinWheel = thorpy.Background(image='abstract.jpg', elements=[self.randomNumberText, self.randomNumberNumber, self.quit2, self.OKPlaceholder])
         self.spinWheelPage = thorpy.Menu(self.spinWheel)
         self.spinWheelPage.play()
 
         self.quiz_resultsLoader()
 
         print("Reached Here - Second spin the wheel page")
-        self.spinWheel = thorpy.Background(image='abstract.jpg', elements=[self.spinWheelText, self.spinWheelInfo, self.quit2, self.OKPlaceholder])
+        randomNumber = random.randint(0, 5)
+        self.spinWheel = thorpy.Background(image='abstract.jpg', elements=[self.randomNumberText, self.randomNumberNumber, self.quit2, self.OKPlaceholder])
         self.spinWheelPage = thorpy.Menu(self.spinWheel)
         self.spinWheelPage.play()
 
@@ -406,9 +415,15 @@ class QuizMain(object):
         self.resultsPage = thorpy.Menu(self.resultsBG)
         self.resultsPage.play()
 
+        # Re-init some varables
+        self.correctQns = 0
+        self.prizesToGive = 0
+        self.randomNumber = random.randint(0, 5)
+
         self.givePrizesLoader()
 
-        self.dispensePrize()
+        if COMPUTER == False:
+            self.dispensePrize()
 
         self.gameLauncher()
 
