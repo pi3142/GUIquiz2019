@@ -18,7 +18,7 @@ This code is a project to teach pupils not to waste food.
 
 <code> export DISPLAY=:0 </code>
 
-##### (The machine that you are remotely connected to must have a X session running at address 0, if not change the address accordingly)
+##### (The Raspberry Pi that you are remotely connected to must have a X session running at address 0, if not change the address accordingly)
 
 ### How to test your code on a Linux / Mac environment
 
