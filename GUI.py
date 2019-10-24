@@ -1,4 +1,4 @@
-import thorpy, pygame, time, random #ThorPy for basic GUI functionality, PyGame for low-level interface with video device
+import thorpy, pygame, time, random, os #ThorPy for basic GUI functionality, PyGame for low-level interface with video device
 
 from threading import Timer
 
@@ -8,7 +8,7 @@ random.seed() #Seed the random number generator
 spinSensorVal = None
 global correct
 correct = False
-COMPUTER = True
+COMPUTER = False
 
 if COMPUTER == False:
     import RPi.GPIO as GPIO
@@ -20,7 +20,7 @@ if COMPUTER == False:
 
     p = GPIO.PWM(servoPIN, 50) # GPIO 17 for PWM with 50Hz
     p.start(2.5) # Initialization
-    p.ChangeDutyCycle(14.5)
+    p.ChangeDutyCycle(8.2)
 
 #try:
 #  while True:
@@ -63,13 +63,11 @@ class RepeatedTimer(object):
 
 class QuizMain(object):
     def openServoOnce(self):
-        print('Closed')
-        p.ChangeDutyCycle(12.5)
-        time.sleep(0.4)
         print('Opened')
-        p.ChangeDutyCycle(14.5)
-        time.sleep(0.4)
-
+        p.ChangeDutyCycle(9)
+        time.sleep(0.05)
+        print('Closed')
+        p.ChangeDutyCycle(8.2)
 
     def dispensePrize(self):
         for x in range(0, self.prizesToGive):
@@ -87,13 +85,14 @@ class QuizMain(object):
             self.testAns = self.P3_4CorrectAns
         else:
             self.testAns = self.P5_6CorrectAns
-        if int(self.testAns[spinSensorVal]) == 1:
+        if int(self.testAns[self.randomNumber]) == 1:
             self.correctQns += 1
             correct = True
             print(correct)
             thorpy.functions.quit_menu_func()
         else:
             correct = False
+            self.correctAns = thorpy.make_text('The correct answer is: \n' + self.row[int(self.testAns[self.randomNumber])-1], 20, (4, 2, 158,100))
             print(correct)
             thorpy.functions.quit_menu_func()
 
@@ -106,13 +105,14 @@ class QuizMain(object):
             self.testAns = self.P3_4CorrectAns
         else:
             self.testAns = self.P5_6CorrectAns
-        if int(self.testAns[spinSensorVal]) == 2:
+        if int(self.testAns[self.randomNumber]) == 2:
             self.correctQns += 1
             correct = True
             print(correct)
             thorpy.functions.quit_menu_func()
         else:
             correct = False
+            self.correctAns = thorpy.make_text('The correct answer is: \n' + self.row[int(self.testAns[self.randomNumber])-1], 20, (4, 2, 158,100))
             print(correct)
             thorpy.functions.quit_menu_func()
 
@@ -125,7 +125,7 @@ class QuizMain(object):
             self.testAns = self.P3_4CorrectAns
         else:
             self.testAns = self.P5_6CorrectAns
-        if int(self.testAns[spinSensorVal]) == 3:
+        if int(self.testAns[self.randomNumber]) == 3:
             self.correctQns += 1
             correct = True
             print(correct)
@@ -133,6 +133,7 @@ class QuizMain(object):
         else:
             correct = False
             print(correct)
+            self.correctAns = thorpy.make_text('The correct answer is: \n' + self.row[int(self.testAns[self.randomNumber])-1], 20, (4, 2, 158,100))
             thorpy.functions.quit_menu_func()
 
     def checkAns4(self):
@@ -144,40 +145,45 @@ class QuizMain(object):
             self.testAns = self.P3_4CorrectAns
         else:
             self.testAns = self.P5_6CorrectAns
-        if int(self.testAns[spinSensorVal]) == 4:
+        if int(self.testAns[self.randomNumber]) == 4:
             self.correctQns += 1
             correct = True
             print(correct)
             thorpy.functions.quit_menu_func()
         else:
             correct = False
+            self.correctAns = thorpy.make_text('The correct answer is: \n' + self.row[int(self.testAns[self.randomNumber])-1], 20, (4, 2, 158,100))
             print(correct)
             thorpy.functions.quit_menu_func()
 
     def createQuizElements(self):
+        spinSensorVal = random.randint(0, 5)
+        self.randomNumber = spinSensorVal
+        print(spinSensorVal)
+        print(self.randomNumber)
         if self.pupilLevel == 1:
             self.questionText = thorpy.make_text(self.P1_2Qn[spinSensorVal], 40, (255, 255, 255, 160))
-            row = self.P1_2Op[spinSensorVal].split(',')
+            self.row = self.P1_2Op[spinSensorVal].split(',')
             print(self.P1_2Op[spinSensorVal])
-            print(row)
-            self.Op1Button = thorpy.make_button(row[0], func=self.checkAns1)
-            self.Op2Button = thorpy.make_button(row[1], func=self.checkAns2)
-            self.Op3Button = thorpy.make_button(row[2], func=self.checkAns3)
-            self.Op4Button = thorpy.make_button(row[3], func=self.checkAns4)
+            print(self.row)
+            self.Op1Button = thorpy.make_button(self.row[0], func=self.checkAns1)
+            self.Op2Button = thorpy.make_button(self.row[1], func=self.checkAns2)
+            self.Op3Button = thorpy.make_button(self.row[2], func=self.checkAns3)
+            self.Op4Button = thorpy.make_button(self.row[3], func=self.checkAns4)
         elif self.pupilLevel == 3:
             self.questionText = thorpy.make_text(self.P3_4Qn[spinSensorVal], 40, (255, 255, 255, 160))
-            row = self.P3_4Op[spinSensorVal].split(',')
-            self.Op1Button = thorpy.make_button(row[0], func=self.checkAns1)
-            self.Op2Button = thorpy.make_button(row[1], func=self.checkAns2)
-            self.Op3Button = thorpy.make_button(row[2], func=self.checkAns3)
-            self.Op4Button = thorpy.make_button(row[3], func=self.checkAns4)
+            self.row = self.P3_4Op[spinSensorVal].split(',')
+            self.Op1Button = thorpy.make_button(self.row[0], func=self.checkAns1)
+            self.Op2Button = thorpy.make_button(self.row[1], func=self.checkAns2)
+            self.Op3Button = thorpy.make_button(self.row[2], func=self.checkAns3)
+            self.Op4Button = thorpy.make_button(self.row[3], func=self.checkAns4)
         else:
             self.questionText = thorpy.make_text(self.P5_6Qn[spinSensorVal], 40, (255, 255, 255, 160))
-            row = self.P5_6Op[spinSensorVal].split(',')
-            self.Op1Button = thorpy.make_button(row[0], func=self.checkAns1)
-            self.Op2Button = thorpy.make_button(row[1], func=self.checkAns2)
-            self.Op3Button = thorpy.make_button(row[2], func=self.checkAns3)
-            self.Op4Button = thorpy.make_button(row[3], func=self.checkAns4)
+            self.row = self.P5_6Op[spinSensorVal].split(',')
+            self.Op1Button = thorpy.make_button(self.row[0], func=self.checkAns1)
+            self.Op2Button = thorpy.make_button(self.row[1], func=self.checkAns2)
+            self.Op3Button = thorpy.make_button(self.row[2], func=self.checkAns3)
+            self.Op4Button = thorpy.make_button(self.row[3], func=self.checkAns4)
 
         #Timer text element
         self.timeTextString = 'Time left: ' + str(self.timeLeft) + ' seconds'
@@ -221,9 +227,12 @@ class QuizMain(object):
         self.application = thorpy.Application(size=(800, 480), caption='Recess Quiz')
 
         #The working varables of the game
+        self.randimNumber = 0
         self.prizesToGive = 0
         self.OK = False
         self.correctQns = 0
+        self.correctAns = None
+        self.row = None
         self.pupilLevel = None #Level of the pupil
         self.maxTime = 25 #Time player has per qn
         self.timeLeft = self.maxTime + 0.125
@@ -251,7 +260,7 @@ class QuizMain(object):
         self.P5_6Level = thorpy.make_button("P5 or 6", func=self.P5_6)
         #Action elements(i.e. OK, quit)
         self.OKbutton2 = thorpy.make_button("Collect my prize(s)!", func=self.OKPressed)
-        self.OKPlaceholder = thorpy.make_button("Continue (Just a placeholder)", func=self.OKPressed)
+        self.OKPlaceholder = thorpy.make_button("Start quiz!", func=self.OKPressed)
         self.OKbutton = thorpy.make_button("Continue", func=self.OKPressed)
         self.OKbutton1 = thorpy.make_button("Continue", func=self.OKPressed)
         self.quit1 = thorpy.make_button("Quit", func=self.gameLauncher)
@@ -261,10 +270,7 @@ class QuizMain(object):
         #Instructions
         # self.instructions = thorpy.make_text("When you click on the continue button at the \nbottom of the screen, you will be prompted \nto spin the wheel to select the question. \nAfter you have done that, a question and four \noptions would appear on the screen. Once \nyou have clicked on one of the options, you \nwould be told if your answer is correct. After that, \nthis process would be repeated once. At the end of the \ngame, you would get lucky stars corresponding \nto the number of questions you correctly answered.", 30, (4, 2, 158, 100))
         self.instructions = thorpy.make_text("Click the CONTINUE button below. \nSpin the colour wheel to get a question. \nFor each question, tap one of the four \noptions for your answer. You have 25 \nseconds to answer each question. \nAnswer two questions and get lucky \nstars corresponding to the number of \ncorrect answers.", 30, (4, 2, 158, 100))
-        self.randomNumber = random.randint(0, 5)
-        spinSensorVal = self.randomNumber
-        print(spinSensorVal)
-        self.randomNumberNumber = thorpy.make_text("Your random number is: " + str(self.randomNumber), 30, (4, 2, 158, 100))
+        self.randomNumberNumber = thorpy.make_text("Your random number has been generated!", 30, (4, 2, 158, 100))
 
         #Static element configuration
         #Instructions page
@@ -272,29 +278,22 @@ class QuizMain(object):
         self.infoText.set_topleft((None, 6))
         self.instructions.center()
         self.instructions.set_topleft((None, 60))
-        self.OKbutton.center()
-        self.OKbutton.set_topleft((None, 350))
-        self.quit1.center()
-        self.quit1.set_topleft((None, 385))
-        #Spin-the-wheel page
+        self.OKbutton.set_topleft((730, 420))
+        self.quit1.set_topleft((5, 420))
+        #Random number presenting page
         self.randomNumberText.center()
         self.randomNumberText.set_topleft((None, 6))
         self.randomNumberNumber.center()
         self.randomNumberNumber.set_topleft((None, 60))
-        self.quit2.center()
-        self.quit2.set_topleft((None, 195))
-        self.OKPlaceholder.center()
-        self.OKPlaceholder.set_topleft((None, 160))
+        self.quit2.set_topleft((5, 420))
+        self.OKPlaceholder.set_topleft((730, 420))
         #Quiz page
-        self.quit3.center()
-        self.quit3.set_topleft((None, 370))
+        self.quit3.set_topleft((5, 420))
         #Results page
         self.nextQuestion.center()
         self.nextQuestion.set_topleft((None, 180))
-        self.OKbutton1.center()
-        self.OKbutton1.set_topleft((None, 250))
-        self.quit4.center()
-        self.quit4.set_topleft((None, 285))
+        self.OKbutton1.set_topleft((730, 420))
+        self.quit4.set_topleft((5, 420))
 
         #First screen box configuration
         self.elements = [self.levelText, self.P1_2Level, self.P3_4Level, self.P5_6Level]
@@ -357,12 +356,21 @@ class QuizMain(object):
         print(correct)
         if correct == True:
             self.resultText = thorpy.make_text("Correct! Fantastic!", 60, (0, 0, 0, 160))
-            correct = False
         else:
             self.resultText = thorpy.make_text("Good try! \nYou might get it right next time.", 60, (0, 0, 0, 160))
+            self.correctAns.center()
+            self.correctAns.set_topleft((None, 235))
         self.resultText.center()
         self.resultText.set_topleft((None, 30))
-        self.resultsBG = thorpy.Background(image='abstract.jpg', elements=[self.resultText, self.nextQuestion, self.OKbutton1, self.quit4])
+        #self.resultsBG = thorpy.Background(image='abstract.jpg', elements=[self.resultText, self.nextQuestion, self.OKbutton1, self.correctAns, self.quit4])
+
+        #self.resultsBG = thorpy.Background(image='abstract.jpg', elements=[self.resultText, self.nextQuestion, self.OKbutton1, self.correctAns, self.quit4])
+        if correct == True:
+            print("I'm supposed to be here...")
+            self.resultsBG = thorpy.Background(image='abstract.jpg', elements=[self.resultText, self.nextQuestion, self.OKbutton1, self.quit4])
+            correct = False
+        else:
+            self.resultsBG = thorpy.Background(image='abstract.jpg', elements=[self.resultText, self.nextQuestion, self.OKbutton1, self.correctAns, self.quit4])
         self.resultsPage = thorpy.Menu(self.resultsBG)
         self.resultsPage.play()
 
@@ -371,8 +379,11 @@ class QuizMain(object):
         self.firstBackground = thorpy.Background(image='quiz.jpg', elements=[self.firstText, self.central_box])
         thorpy.store(self.firstBackground)
 
+        # os.system("gtts-cli 'Come to out booth! We have a game to teach you not to waste food!' --output gtts.mp3")
+        # os.system("omxplayer --loop gtts.mp3 &")
         self.startScreen = thorpy.Menu(self.firstBackground)
         self.startScreen.play()
+        # os.system("sudo killall omxplayer")
         print("Reached Here - End of level page")
 
         #Write Instructions to screen
@@ -395,6 +406,9 @@ class QuizMain(object):
         self.spinWheelPage = thorpy.Menu(self.spinWheel)
         self.spinWheelPage.play()
 
+        spinSensorVal = random.randint(0, 5)
+        self.randomNumber = spinSensorVal
+
         print("Reached Here - Second question and result")
         self.createQuizElements()
         self.quizGame = thorpy.Background(image='quizAbstract.jpg', elements=[self.questionText, self.Op1Button, self.Op2Button, self.Op3Button, self.Op3Button, self.Op4Button, self.quit3])
@@ -406,24 +420,28 @@ class QuizMain(object):
         print(correct)
         if correct == True:
             self.resultText = thorpy.make_text("Correct! Fantastic!", 60, (0, 0, 0, 160))
-            correct = False
         else:
             self.resultText = thorpy.make_text("Good try! \nYou might get it right next time.", 60, (0, 0, 0, 160))
         self.resultText.center()
         self.resultText.set_topleft((None, 30))
-        self.resultsBG = thorpy.Background(image='abstract.jpg', elements=[self.resultText, self.OKbutton1, self.quit4])
+        if correct == True:
+            self.resultsBG = thorpy.Background(image='abstract.jpg', elements=[self.resultText, self.OKbutton1, self.quit4])
+            correct = False
+        else:
+            self.resultsBG = thorpy.Background(image='abstract.jpg', elements=[self.resultText, self.OKbutton1, self.correctAns, self.quit4])
         self.resultsPage = thorpy.Menu(self.resultsBG)
         self.resultsPage.play()
-
-        # Re-init some varables
-        self.correctQns = 0
-        self.prizesToGive = 0
-        self.randomNumber = random.randint(0, 5)
 
         self.givePrizesLoader()
 
         if COMPUTER == False:
             self.dispensePrize()
+
+        # Re-init some varables
+        self.correctQns = 0
+        self.prizesToGive = 0
+        spinSensorVal = random.randint(0, 5)
+        self.randomNumber = spinSensorVal
 
         self.gameLauncher()
 
